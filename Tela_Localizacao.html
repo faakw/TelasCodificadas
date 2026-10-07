@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Nexo - Cadastrar Locais</title>
+  
+  <!-- Fontes -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;700&family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <style>
+    /* VARIÁVEIS E ESTILOS GERAIS */
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      --card-bg: #b0b5bd;
+      --card-border: #0000ff;
+      --input-bg: #000000;
+      --input-text: #ffffff;
+      --btn-blue: #0000ff;
+      --btn-blue-hover: #0000cc;
+      --btn-cyan: #38bdf8;
+      --btn-cyan-hover: #0284c7;
+      --text-dark: #111827;
+      --shadow-retro: 0 10px 25px -5px rgba(0, 0, 255, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    /* BARRA SUPERIOR (+ NOVO LOCAL) */
+    .top-bar {
+      width: 100%;
+      max-width: 1200px;
+      margin-bottom: 1.5rem;
+      display: flex;
+      justify-content: flex-start;
+    }
+
+    .btn-top-bar {
+      background-color: var(--btn-blue);
+      color: #fff;
+      border: 2px solid #000;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      padding: 0.6rem 1.2rem;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+      box-shadow: 3px 3px 0px #000;
+      transition: transform 0.1s, box-shadow 0.1s;
+      text-transform: uppercase;
+    }
+
+    .btn-top-bar:hover {
+      transform: translate(-2px, -2px);
+      box-shadow: 5px 5px 0px #000;
+    }
+
+    /* ESTRUTURA DO CONTAINER */
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+    }
+
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* CARDS ESTILO RETRÔ */
+    .retro-card {
+      background-color: var(--card-bg);
+      border: 8px solid var(--card-border);
+      border-radius: 36px;
+      padding: 1.8rem 1.5rem;
+      color: var(--text-dark);
+      box-shadow: var(--shadow-retro);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .retro-title {
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1.6rem;
+      text-align: center;
+      color: #000;
+      letter-spacing: 1px;
+      margin-bottom: 1.5rem;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    /* FORMULÁRIO */
+    .form-group {
+      display: flex;
+      align-items: center;
+      margin-bottom: 0.85rem;
+      gap: 10px;
+    }
+
+    .form-label {
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: #000;
+      width: 45%;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      line-height: 1.1;
+    }
+
+    .form-label small {
+      font-size: 0.75rem;
+      font-weight: normal;
+      display: block;
+    }
+
+    .form-input, .form-textarea {
+      width: 55%;
+      background-color: var(--input-bg);
+      color: var(--input-text);
+      border: 2px solid #fff;
+      padding: 0.55rem 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      outline: none;
+      border-radius: 4px;
+    }
+
+    .form-textarea {
+      resize: vertical;
+      min-height: 50px;
+    }
+
+    .form-input:focus, .form-textarea:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.5);
+    }
+
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: auto;
+      padding-top: 1rem;
+    }
+
+    .btn-submit {
+      background-color: var(--btn-blue);
+      color: #fff;
+      border: 2px solid #000;
+      border-radius: 20px;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      padding: 0.5rem 1.8rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 2px 2px 0px #000;
+      transition: all 0.2s;
+    }
+
+    .btn-submit:hover {
+      background-color: var(--btn-blue-hover);
+      transform: scale(1.03);
+    }
+
+    /* LISTA DE LOCALIZAÇÕES */
+    .locations-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+      max-height: 380px;
+      overflow-y: auto;
+      padding-right: 5px;
+    }
+
+    .location-row {
+      display: flex;
+      border: 3px solid #000;
+      background-color: #fff;
+      cursor: pointer;
+      transition: transform 0.15s, box-shadow 0.15s;
+    }
+
+    .location-row.selected {
+      outline: 4px solid var(--btn-blue);
+    }
+
+    .location-title-box {
+      flex: 1;
+      padding: 0.8rem 1rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      text-align: center;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #000;
+      text-transform: uppercase;
+      border-right: 3px solid #000;
+      background-color: #fff;
+    }
+
+    .location-action-box {
+      width: 40%;
+      background-color: var(--btn-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem;
+      text-align: center;
+      transition: background-color 0.2s;
+    }
+
+    .location-row:hover .location-action-box {
+      background-color: var(--btn-cyan-hover);
+    }
+
+    .btn-details {
+      background: none;
+      border: none;
+      color: #000;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      line-height: 1.1;
+    }
+
+    .list-bottom-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 1rem;
+    }
+
+    .btn-bottom {
+      background-color: var(--btn-blue);
+      color: #fff;
+      border: 2px solid #000;
+      border-radius: 20px;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      padding: 0.45rem 1.6rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 2px 2px 0px #000;
+      transition: all 0.2s;
+    }
+
+    .btn-bottom:hover {
+      background-color: var(--btn-blue-hover);
+      transform: scale(1.03);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 2rem;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      color: #4b5563;
+    }
+
+    /* TOAST / NOTIFICAÇÃO (RNFO07) */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+    }
+
+    .toast {
+      background: #000;
+      color: #fff;
+      border: 2px solid #38bdf8;
+      padding: 0.8rem 1.4rem;
+      border-radius: 8px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideIn 0.3s forwards;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+
+    /* MODAL DE DETALHES */
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+      background: rgba(15, 23, 42, 0.8);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.2s;
+    }
+
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .modal-card {
+      background-color: var(--card-bg);
+      border: 6px solid var(--card-border);
+      border-radius: 24px;
+      width: 90%;
+      max-width: 500px;
+      padding: 1.5rem;
+      color: var(--text-dark);
+      box-shadow: var(--shadow-retro);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 1rem;
+      border-bottom: 2px solid #000;
+      padding-bottom: 0.5rem;
+    }
+
+    .modal-title {
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1.4rem;
+      text-transform: uppercase;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      font-size: 1.5rem;
+      font-weight: bold;
+      cursor: pointer;
+      color: #000;
+    }
+
+    .modal-body-item {
+      margin-bottom: 0.8rem;
+      font-size: 0.95rem;
+    }
+
+    .modal-body-item strong {
+      font-family: 'Chakra Petch', sans-serif;
+      text-transform: uppercase;
+      color: #000;
+      display: inline-block;
+      width: 140px;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- BARRA SUPERIOR -->
+  <div class="top-bar">
+    <button class="btn-top-bar" id="btnNewLocation">
+      <span>+</span> NOVO LOCAL
+    </button>
+  </div>
+
+  <!-- CONTAINER PRINCIPAL -->
+  <div class="container">
+    
+    <!-- CARD ESQUERDO: FORMULÁRIO -->
+    <div class="retro-card">
+      <h1 class="retro-title">CADASTRAR<br>LOCAIS</h1>
+      
+      <form id="locationForm">
+        <div class="form-group">
+          <label class="form-label" for="locName">LOCAL -</label>
+          <input type="text" id="locName" class="form-input" required placeholder="Ex: Sala 202">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="locDesc">DESCRIÇÃO -</label>
+          <textarea id="locDesc" class="form-textarea" required placeholder="Ex: Sala de aula com projetor"></textarea>
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="locBuilding">BLOCO/PRÉDIO -<br><small>(OPCIONAL)</small></label>
+          <input type="text" id="locBuilding" class="form-input" placeholder="Ex: Bloco A">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="locFloor">ANDAR -<br><small>(OPCIONAL)</small></label>
+          <input type="text" id="locFloor" class="form-input" placeholder="Ex: 2º Andar">
+        </div>
+
+        <div class="form-group">
+          <label class="form-label" for="locRoom">Nº SALA -<br><small>(OPCIONAL)</small></label>
+          <input type="text" id="locRoom" class="form-input" placeholder="Ex: 202">
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-submit" id="btnSubmit">ENVIAR</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- CARD DIREITO: LISTA DE LOCALIZAÇÕES -->
+    <div class="retro-card">
+      <h2 class="retro-title">LOCALIZAÇÕES REGISTRADAS</h2>
+
+      <div class="locations-list" id="locationsList">
+        <!-- Itens injetados via JS -->
+      </div>
+
+      <div class="list-bottom-actions">
+        <button class="btn-bottom" id="btnEdit">EDITAR</button>
+        <button class="btn-bottom" id="btnDelete">EXCLUIR</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- MODAL DE DETALHES -->
+  <div class="modal-overlay" id="detailsModal">
+    <div class="modal-card">
+      <div class="modal-header">
+        <h3 class="modal-title" id="mTitle">DETALHES DO LOCAL</h3>
+        <button class="modal-close" id="btnCloseModal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="modal-body-item"><strong>Bloco / Prédio:</strong> <span id="mBuilding"></span></div>
+        <div class="modal-body-item"><strong>Andar:</strong> <span id="mFloor"></span></div>
+        <div class="modal-body-item"><strong>Nº Sala:</strong> <span id="mRoom"></span></div>
+        <div class="modal-body-item" style="margin-top:10px;"><strong>Descrição:</strong></div>
+        <p id="mDesc" style="background:#fff; padding:8px; border:1px solid #000; border-radius:4px; font-size:0.9rem; margin-top:4px; font-family:'JetBrains Mono', monospace;"></p>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONTAINER DE NOTIFICAÇÕES -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // DADOS INICIAIS DE EXEMPLO (CONFORME WIREFRAME)
+    let locations = [
+      {
+        id: 1,
+        name: "SALA 202",
+        desc: "Sala de aula equipada com projetor e ar-condicionado.",
+        building: "Bloco B",
+        floor: "2º Andar",
+        room: "202"
+      },
+      {
+        id: 2,
+        name: "LABORATÓRIO DE QUÍMICA",
+        desc: "Laboratório para aulas práticas com bancadas e capela de exaustão.",
+        building: "Bloco A",
+        floor: "1º Andar",
+        room: "105"
+      },
+      {
+        id: 3,
+        name: "BIBLIOTECA",
+        desc: "Espaço de estudos com acervo geral e computadores de pesquisa.",
+        building: "Prédio Central",
+        floor: "Térreo",
+        room: "N/A"
+      },
+      {
+        id: 4,
+        name: "BANHEIRO MASCULINO",
+        desc: "Banheiro coletivo masculino próximo ao refeitório.",
+        building: "Bloco C",
+        floor: "Térreo",
+        room: "N/A"
+      }
+    ];
+
+    let selectedLocationId = null;
+    let editingLocationId = null;
+
+    // ELEMENTOS DO DOM
+    const locationForm = document.getElementById('locationForm');
+    const locName = document.getElementById('locName');
+    const locDesc = document.getElementById('locDesc');
+    const locBuilding = document.getElementById('locBuilding');
+    const locFloor = document.getElementById('locFloor');
+    const locRoom = document.getElementById('locRoom');
+    const btnSubmit = document.getElementById('btnSubmit');
+    const locationsList = document.getElementById('locationsList');
+
+    const btnEdit = document.getElementById('btnEdit');
+    const btnDelete = document.getElementById('btnDelete');
+    const btnNewLocation = document.getElementById('btnNewLocation');
+
+    // MODAL
+    const detailsModal = document.getElementById('detailsModal');
+    const btnCloseModal = document.getElementById('btnCloseModal');
+    const mTitle = document.getElementById('mTitle');
+    const mBuilding = document.getElementById('mBuilding');
+    const mFloor = document.getElementById('mFloor');
+    const mRoom = document.getElementById('mRoom');
+    const mDesc = document.getElementById('mDesc');
+
+    // RENDERIZAR LISTA DE LOCAIS
+    function renderLocations() {
+      locationsList.innerHTML = '';
+      
+      if (locations.length === 0) {
+        locationsList.innerHTML = '<div class="empty-state">Nenhum local cadastrado.</div>';
+        return;
+      }
+
+      locations.forEach(loc => {
+        const row = document.createElement('div');
+        row.className = `location-row ${selectedLocationId === loc.id ? 'selected' : ''}`;
+        row.onclick = () => selectLocation(loc.id);
+
+        row.innerHTML = `
+          <div class="location-title-box">${loc.name}</div>
+          <div class="location-action-box">
+            <button type="button" class="btn-details" onclick="openDetails(event, ${loc.id})">VER MAIS<br>DETALHES</button>
+          </div>
+        `;
+
+        locationsList.appendChild(row);
+      });
+    }
+
+    // SELECIONAR ITEM DA LISTA
+    function selectLocation(id) {
+      if (selectedLocationId === id) {
+        selectedLocationId = null;
+      } else {
+        selectedLocationId = id;
+      }
+      renderLocations();
+    }
+
+    // ABRIR MODAL
+    function openDetails(event, id) {
+      event.stopPropagation();
+      const loc = locations.find(l => l.id === id);
+      if (!loc) return;
+
+      mTitle.textContent = loc.name;
+      mBuilding.textContent = loc.building || 'Não informado';
+      mFloor.textContent = loc.floor || 'Não informado';
+      mRoom.textContent = loc.room || 'Não informado';
+      mDesc.textContent = loc.desc || 'Sem descrição cadastrada.';
+
+      detailsModal.classList.add('active');
+    }
+
+    // FECHAR MODAL
+    btnCloseModal.onclick = () => detailsModal.classList.remove('active');
+    detailsModal.onclick = (e) => {
+      if (e.target === detailsModal) detailsModal.classList.remove('active');
+    };
+
+    // MENSAGENS DE FEEDBACK (RNFO07)
+    function showToast(message) {
+      const toastContainer = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<span>ℹ️</span> <span>${message}</span>`;
+      
+      toastContainer.appendChild(toast);
+
+      setTimeout(() => {
+        toast.remove();
+      }, 4000);
+    }
+
+    // LIMPAR FORMULÁRIO
+    function clearForm() {
+      editingLocationId = null;
+      locationForm.reset();
+      btnSubmit.textContent = 'ENVIAR';
+    }
+
+    btnNewLocation.onclick = () => {
+      clearForm();
+      showToast('Formulário pronto para cadastrar um novo local.');
+    };
+
+    // SALVAR / ATUALIZAR LOCAL
+    locationForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const name = locName.value.trim();
+      const desc = locDesc.value.trim();
+      const building = locBuilding.value.trim();
+      const floor = locFloor.value.trim();
+      const room = locRoom.value.trim();
+
+      if (!name || !desc) {
+        showToast('Por favor, preencha o nome do local e a descrição.');
+        return;
+      }
+
+      if (editingLocationId) {
+        const index = locations.findIndex(l => l.id === editingLocationId);
+        if (index !== -1) {
+          locations[index] = {
+            ...locations[index],
+            name: name.toUpperCase(),
+            desc,
+            building,
+            floor,
+            room
+          };
+          showToast('Localização atualizada com sucesso!');
+        }
+      } else {
+        const newLocation = {
+          id: Date.now(),
+          name: name.toUpperCase(),
+          desc,
+          building,
+          floor,
+          room
+        };
+        locations.unshift(newLocation);
+        showToast('Nova localização cadastrada com sucesso!');
+      }
+
+      clearForm();
+      renderLocations();
+    });
+
+    // EDITAR LOCAL
+    btnEdit.onclick = () => {
+      if (!selectedLocationId) {
+        showToast('Selecione uma localização na lista para editar.');
+        return;
+      }
+
+      const loc = locations.find(l => l.id === selectedLocationId);
+      if (!loc) return;
+
+      editingLocationId = loc.id;
+      locName.value = loc.name;
+      locDesc.value = loc.desc;
+      locBuilding.value = loc.building || '';
+      locFloor.value = loc.floor || '';
+      locRoom.value = loc.room || '';
+
+      btnSubmit.textContent = 'SALVAR';
+      showToast(`Editando localização: "${loc.name}"`);
+    };
+
+    // EXCLUIR LOCAL
+    btnDelete.onclick = () => {
+      if (!selectedLocationId) {
+        showToast('Selecione uma localização na lista para excluir.');
+        return;
+      }
+
+      const loc = locations.find(l => l.id === selectedLocationId);
+      if (confirm(`Tem certeza que deseja remover a localização "${loc.name}"?`)) {
+        locations = locations.filter(l => l.id !== selectedLocationId);
+        selectedLocationId = null;
+        if (editingLocationId === selectedLocationId) clearForm();
+        renderLocations();
+        showToast('Localização removida com sucesso.');
+      }
+    };
+
+    // INICIALIZAR LISTA
+    renderLocations();
+  </script>
+</body>
+</html>
+

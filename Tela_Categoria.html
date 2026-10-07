@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sistema Nexo - Categorias do Problema/Sugestão</title>
+
+  
+  <style>
+    /* VARIÁVEIS E ESTILOS GERAIS */
+    :root {
+      --bg-gradient: linear-gradient(135deg, #0f172a 0%, #1e1b4b 50%, #0f172a 100%);
+      --card-bg: #b0b5bd;
+      --card-border: #0000ff;
+      --input-bg: #000000;
+      --input-text: #ffffff;
+      --btn-blue: #0000ff;
+      --btn-blue-hover: #0000cc;
+      --btn-cyan: #38bdf8;
+      --btn-cyan-hover: #0284c7;
+      --text-dark: #111827;
+      --shadow-retro: 0 10px 25px -5px rgba(0, 0, 255, 0.3);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      background: var(--bg-gradient);
+      min-height: 100vh;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 2rem 1rem;
+    }
+
+    /* CONTAINER PRINCIPAL */
+    .container {
+      width: 100%;
+      max-width: 1200px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem;
+      margin-top: 1rem;
+    }
+
+    @media (max-width: 900px) {
+      .container {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    /* CARDS ESTILO RETRÔ */
+    .retro-card {
+      background-color: var(--card-bg);
+      border: 8px solid var(--card-border);
+      border-radius: 36px;
+      padding: 1.8rem 1.5rem;
+      color: var(--text-dark);
+      box-shadow: var(--shadow-retro);
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .retro-title {
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1.5rem;
+      text-align: center;
+      color: #000;
+      letter-spacing: 1px;
+      margin-bottom: 1.2rem;
+      text-transform: uppercase;
+      line-height: 1.2;
+    }
+
+    /* FORMULÁRIO DO CARD ESQUERDO */
+    .form-group-inline {
+      display: flex;
+      align-items: center;
+      margin-bottom: 1rem;
+      gap: 10px;
+    }
+
+    .form-label {
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1.2rem;
+      color: #000;
+      width: 45%;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .form-input-cat {
+      width: 55%;
+      background-color: var(--input-bg);
+      color: var(--input-text);
+      border: 2px solid #fff;
+      padding: 0.5rem 0.8rem;
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 0.95rem;
+      outline: none;
+      border-radius: 4px;
+    }
+
+    .form-input-cat:focus {
+      border-color: #38bdf8;
+      box-shadow: 0 0 0 2px rgba(56, 189, 248, 0.5);
+    }
+
+    .color-selector-label {
+      width: 55%;
+      background-color: var(--input-bg);
+      color: #fff;
+      border: 2px solid #fff;
+      padding: 0.5rem 0.8rem;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 0.9rem;
+      text-align: center;
+      text-transform: uppercase;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+
+    /* MATRIZ DE CATEGORIAS E CORES */
+    .category-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      border: 3px solid #000;
+      background-color: #000;
+      padding: 2px;
+      margin-bottom: 1.2rem;
+    }
+
+    .category-row-item {
+      display: flex;
+      height: 42px;
+      cursor: pointer;
+    }
+
+    .cat-name-cell {
+      flex: 1;
+      background-color: #fff;
+      color: #000;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      text-transform: uppercase;
+      border-right: 2px solid #000;
+    }
+
+    .cat-color-cell {
+      width: 40%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #000;
+      text-transform: uppercase;
+      transition: opacity 0.2s;
+    }
+
+    .cat-color-cell.color-azul { background-color: #38bdf8; }
+    .cat-color-cell.color-laranja { background-color: #f97316; }
+    .cat-color-cell.color-verde { background-color: #14b8a6; }
+    .cat-color-cell.color-roxo { background-color: #c084fc; }
+    .cat-color-cell.color-amarelo { background-color: #facc15; }
+    .cat-color-cell.color-vermelho { background-color: #ef4444; }
+
+    .category-row-item:hover .cat-color-cell {
+      opacity: 0.85;
+    }
+
+    /* CARD DIREITO - FILTRO DE BUSCA */
+    .search-filter-box {
+      display: flex;
+      border: 3px solid #000;
+      margin-bottom: 1rem;
+      background-color: #fff;
+    }
+
+    .search-input {
+      flex: 1;
+      border: none;
+      padding: 0.6rem 0.8rem;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      outline: none;
+      color: #000;
+      text-transform: uppercase;
+    }
+
+    .btn-filter {
+      background-color: var(--btn-blue);
+      color: #fff;
+      border: none;
+      border-left: 3px solid #000;
+      padding: 0.6rem 1rem;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      text-transform: uppercase;
+    }
+
+    .btn-filter:hover {
+      background-color: var(--btn-blue-hover);
+    }
+
+    /* LISTA DE CATEGORIAS REGISTRADAS (DIREITA) */
+    .registered-categories-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-bottom: 1.2rem;
+      max-height: 320px;
+      overflow-y: auto;
+      padding-right: 4px;
+    }
+
+    .reg-cat-row {
+      display: flex;
+      border: 3px solid #000;
+      background-color: #fff;
+      height: 48px;
+      cursor: pointer;
+      transition: transform 0.15s;
+    }
+
+    .reg-cat-row.selected {
+      outline: 4px solid var(--btn-blue);
+    }
+
+    .reg-cat-name {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      color: #000;
+      text-transform: uppercase;
+      border-right: 3px solid #000;
+      padding: 0 0.5rem;
+      text-align: center;
+    }
+
+    .reg-cat-count {
+      width: 45%;
+      background-color: var(--btn-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: #000;
+      text-transform: uppercase;
+      padding: 0 0.5rem;
+      text-align: center;
+    }
+
+    /* BOTÕES INFERIORES */
+    .form-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: auto;
+      padding-top: 0.8rem;
+    }
+
+    .list-bottom-actions {
+      display: flex;
+      justify-content: space-between;
+      margin-top: auto;
+      padding-top: 0.8rem;
+    }
+
+    .btn-action {
+      background-color: var(--btn-blue);
+      color: #fff;
+      border: 2px solid #000;
+      border-radius: 20px;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      font-size: 1.05rem;
+      padding: 0.45rem 1.8rem;
+      cursor: pointer;
+      text-transform: uppercase;
+      box-shadow: 2px 2px 0px #000;
+      transition: all 0.2s;
+    }
+
+    .btn-action:hover {
+      background-color: var(--btn-blue-hover);
+      transform: scale(1.03);
+    }
+
+    .empty-state {
+      text-align: center;
+      padding: 1.5rem;
+      font-family: 'Chakra Petch', sans-serif;
+      font-weight: 700;
+      color: #4b5563;
+    }
+
+    /* TOAST / NOTIFICAÇÃO (RNFO07) */
+    .toast-container {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      z-index: 9999;
+    }
+
+    .toast {
+      background: #000;
+      color: #fff;
+      border: 2px solid #38bdf8;
+      padding: 0.8rem 1.4rem;
+      border-radius: 8px;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      font-weight: 600;
+      font-size: 0.95rem;
+      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      animation: slideIn 0.3s forwards;
+    }
+
+    @keyframes slideIn {
+      from { transform: translateY(100%); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- CONTAINER PRINCIPAL -->
+  <div class="container">
+    
+    <!-- CARD ESQUERDO: SELEÇÃO/CADASTRO DE CATEGORIA -->
+    <div class="retro-card">
+      <h1 class="retro-title">QUAL É A CATEGORIA DO<br>PROBLEMA/SUGESTÃO?</h1>
+      
+      <form id="categoryForm">
+        <div class="form-group-inline">
+          <label class="form-label" for="catInputName">CATEGORIA -</label>
+          <input type="text" id="catInputName" class="form-input-cat" placeholder="NOME..." required>
+        </div>
+
+        <div class="form-group-inline">
+          <label class="form-label">COR -</label>
+          <select id="catColorSelect" class="color-selector-label" style="outline:none;" required>
+            <option value="AZUL">AZUL</option>
+            <option value="LARANJA">LARANJA</option>
+            <option value="VERDE">VERDE</option>
+            <option value="ROXO">ROXO</option>
+            <option value="AMARELO">AMARELO</option>
+            <option value="VERMELHO">VERMELHO</option>
+          </select>
+        </div>
+
+        <!-- MATRIZ VISUAL DE CATEGORIAS -->
+        <div class="category-grid" id="categoryVisualGrid">
+          <!-- Injetado dinamicamente via JavaScript -->
+        </div>
+
+        <div class="form-actions">
+          <button type="submit" class="btn-action" id="btnSubmit">ENVIAR</button>
+        </div>
+      </form>
+    </div>
+
+    <!-- CARD DIREITO: CATEGORIAS REGISTRADAS -->
+    <div class="retro-card">
+      <h2 class="retro-title">CATEGORIAS REGISTRADAS</h2>
+
+      <!-- BUSCA / FILTRO -->
+      <div class="search-filter-box">
+        <input type="text" id="searchInput" class="search-input" placeholder="BUSCAR CATEGORIA">
+        <button type="button" class="btn-filter" id="btnFilter">
+          <span>⚙️</span> FILTRAR
+        </button>
+      </div>
+
+      <!-- LISTA DE CATEGORIAS REGISTRADAS COM CONTAGEM -->
+      <div class="registered-categories-list" id="registeredList">
+        <!-- Injetado via JS -->
+      </div>
+
+      <div class="list-bottom-actions">
+        <button class="btn-action" id="btnEdit">EDITAR</button>
+        <button class="btn-action" id="btnDelete">EXCLUIR</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- NOTIFICAÇÕES TOAST (RNFO07) -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <script>
+    // DADOS INICIAIS (FIÉIS AO SEU PROTÓTIPO)
+    let categories = [
+      { id: 1, name: "INFRAESTRUTURA", color: "AZUL", colorClass: "color-azul", count: 26 },
+      { id: 2, name: "T.I", color: "LARANJA", colorClass: "color-laranja", count: 11 },
+      { id: 3, name: "RH", color: "VERDE", colorClass: "color-verde", count: 9 },
+      { id: 4, name: "SEGURANÇA", color: "ROXO", colorClass: "color-roxo", count: 27 },
+      { id: 5, name: "AMBIENTE", color: "AMARELO", colorClass: "color-amarelo", count: 15 }
+    ];
+
+    let selectedCatId = null;
+    let editingCatId = null;
+
+    // MAPA DE CLASSES DE CORES
+    const colorMap = {
+      "AZUL": "color-azul",
+      "LARANJA": "color-laranja",
+      "VERDE": "color-verde",
+      "ROXO": "color-roxo",
+      "AMARELO": "color-amarelo",
+      "VERMELHO": "color-vermelho"
+    };
+
+    // ELEMENTOS DOM
+    const categoryForm = document.getElementById('categoryForm');
+    const catInputName = document.getElementById('catInputName');
+    const catColorSelect = document.getElementById('catColorSelect');
+    const categoryVisualGrid = document.getElementById('categoryVisualGrid');
+    const registeredList = document.getElementById('registeredList');
+    const searchInput = document.getElementById('searchInput');
+    const btnFilter = document.getElementById('btnFilter');
+
+    const btnSubmit = document.getElementById('btnSubmit');
+    const btnEdit = document.getElementById('btnEdit');
+    const btnDelete = document.getElementById('btnDelete');
+
+    // RENDERIZAR PAINEL ESQUERDO (MATRIZ VISUAL)
+    function renderVisualGrid() {
+      categoryVisualGrid.innerHTML = '';
+      categories.forEach(cat => {
+        const row = document.createElement('div');
+        row.className = 'category-row-item';
+        row.onclick = () => fillFormWithCat(cat);
+
+        row.innerHTML = `
+          <div class="cat-name-cell">${cat.name}</div>
+          <div class="cat-color-cell ${cat.colorClass}">${cat.color}</div>
+        `;
+        categoryVisualGrid.appendChild(row);
+      });
+    }
+
+    // RENDERIZAR PAINEL DIREITO (LISTA REGISTRADA COM BUSCA)
+    function renderRegisteredList(filterText = '') {
+      registeredList.innerHTML = '';
+      
+      const filtered = categories.filter(c => 
+        c.name.toLowerCase().includes(filterText.toLowerCase())
+      );
+
+      if (filtered.length === 0) {
+        registeredList.innerHTML = '<div class="empty-state">Nenhuma categoria encontrada.</div>';
+        return;
+      }
+
+      filtered.forEach(cat => {
+        const row = document.createElement('div');
+        row.className = `reg-cat-row ${selectedCatId === cat.id ? 'selected' : ''}`;
+        row.onclick = () => selectCategory(cat.id);
+
+        row.innerHTML = `
+          <div class="reg-cat-name">${cat.name}</div>
+          <div class="reg-cat-count">${cat.count} OCORRÊNCIAS</div>
+        `;
+        registeredList.appendChild(row);
+      });
+    }
+
+    // PREENCHER FORMULÁRIO AO CLICAR NA GRADE ESQUERDA
+    function fillFormWithCat(cat) {
+      catInputName.value = cat.name;
+      catColorSelect.value = cat.color;
+      editingCatId = cat.id;
+      btnSubmit.textContent = 'SALVAR';
+      showToast(`Categoria "${cat.name}" carregada no formulário.`);
+    }
+
+    // SELECIONAR ITEM NA LISTA DA DIREITA
+    function selectCategory(id) {
+      if (selectedCatId === id) {
+        selectedCatId = null;
+      } else {
+        selectedCatId = id;
+      }
+      renderRegisteredList(searchInput.value.trim());
+    }
+
+    // MENSAGENS FEEDBACK (RNFO07)
+    function showToast(message) {
+      const toastContainer = document.getElementById('toastContainer');
+      const toast = document.createElement('div');
+      toast.className = 'toast';
+      toast.innerHTML = `<span>ℹ️</span> <span>${message}</span>`;
+      
+      toastContainer.appendChild(toast);
+
+      setTimeout(() => {
+        toast.remove();
+      }, 4000);
+    }
+
+    // LIMPAR FORMULÁRIO
+    function clearForm() {
+      editingCatId = null;
+      categoryForm.reset();
+      btnSubmit.textContent = 'ENVIAR';
+    }
+
+    // SUBMIT FORMULARIO (CRIAR / EDITAR)
+    categoryForm.addEventListener('submit', function(e) {
+      e.preventDefault();
+
+      const name = catInputName.value.trim().toUpperCase();
+      const color = catColorSelect.value;
+      const colorClass = colorMap[color] || 'color-azul';
+
+      if (!name) {
+        showToast('Informe o nome da categoria.');
+        return;
+      }
+
+      if (editingCatId) {
+        // EDICAO
+        const index = categories.findIndex(c => c.id === editingCatId);
+        if (index !== -1) {
+          categories[index].name = name;
+          categories[index].color = color;
+          categories[index].colorClass = colorClass;
+          showToast(`Categoria "${name}" atualizada com sucesso!`);
+        }
+      } else {
+        // NOVO CADASTRO
+        const newCat = {
+          id: Date.now(),
+          name,
+          color,
+          colorClass,
+          count: 0
+        };
+        categories.push(newCat);
+        showToast(`Nova categoria "${name}" cadastrada com sucesso!`);
+      }
+
+      clearForm();
+      renderVisualGrid();
+      renderRegisteredList(searchInput.value.trim());
+    });
+
+    // EDITAR CATEGORIA SELECIONADA NA DIREITA
+    btnEdit.onclick = () => {
+      if (!selectedCatId) {
+        showToast('Selecione uma categoria na lista da direita para editar.');
+        return;
+      }
+
+      const cat = categories.find(c => c.id === selectedCatId);
+      if (!cat) return;
+
+      fillFormWithCat(cat);
+    };
+
+    // EXCLUIR CATEGORIA SELECIONADA
+    btnDelete.onclick = () => {
+      if (!selectedCatId) {
+        showToast('Selecione uma categoria na lista da direita para excluir.');
+        return;
+      }
+
+      const cat = categories.find(c => c.id === selectedCatId);
+      if (confirm(`Tem certeza que deseja excluir a categoria "${cat.name}"?`)) {
+        categories = categories.filter(c => c.id !== selectedCatId);
+        selectedCatId = null;
+        if (editingCatId === selectedCatId) clearForm();
+        
+        renderVisualGrid();
+        renderRegisteredList(searchInput.value.trim());
+        showToast('Categoria removida com sucesso.');
+      }
+    };
+
+    // BUSCA / FILTRAR
+    btnFilter.onclick = () => {
+      renderRegisteredList(searchInput.value.trim());
+      showToast('Filtro aplicado.');
+    };
+
+    searchInput.addEventListener('keyup', (e) => {
+      renderRegisteredList(e.target.value.trim());
+    });
+
+    // INICIALIZAÇÃO
+    renderVisualGrid();
+    renderRegisteredList();
+  </script>
+</body>
+</html>
+

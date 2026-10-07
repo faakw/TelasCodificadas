@@ -1,0 +1,443 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema Nexo - Gestão de Usuários</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        nexo: {
+                            blue: '#0000d1',
+                            blueHover: '#0000a0',
+                            panelBg: '#bcbcbc',
+                            headerBlue: '#8da4ff',
+                            cellBlue: '#dbe4ff'
+                        }
+                    },
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Courier New', 'monospace']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background: radial-gradient(circle at top, #1e1b4b 0%, #0f172a 100%);
+            min-height: 100vh;
+        }
+
+        
+        .retro-panel {
+            background-color: #c0c0c0;
+            border: 4px solid #0000d1;
+            border-radius: 28px;
+            box-shadow: 0 20px 30px rgba(0, 0, 0, 0.4), inset 0 2px 4px rgba(255, 255, 255, 0.5);
+        }
+
+        .retro-title {
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: 900;
+            letter-spacing: 1.5px;
+            text-transform: uppercase;
+        }
+
+        .retro-input {
+            background-color: #000000;
+            color: #ffffff;
+            font-family: 'Courier New', Courier, monospace;
+            font-weight: bold;
+            border-radius: 6px;
+            border: 1px solid #333333;
+            transition: all 0.2s ease;
+        }
+
+        .retro-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 10px rgba(37, 99, 235, 0.8);
+        }
+
+        .retro-btn {
+            background-color: #0000d1;
+            color: #ffffff;
+            font-weight: 800;
+            border-radius: 9999px;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            text-transform: uppercase;
+        }
+
+        .retro-btn:hover {
+            background-color: #0000a0;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4);
+        }
+
+        .retro-btn:active {
+            transform: translateY(0);
+        }
+
+        .retro-cell-header {
+            background-color: #8da4ff;
+            color: #000000;
+            font-weight: 900;
+        }
+
+        .retro-cell-data {
+            background-color: #dbe4ff;
+            color: #000000;
+            font-weight: 600;
+        }
+
+        /* Custom Toast Animation */
+        @keyframes slideIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+        .toast-animate {
+            animation: slideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+    </style>
+</head>
+<body class="text-slate-100 flex flex-col min-h-screen">
+
+    <!-- Header Navigation -->
+    <header class="bg-slate-900/90 backdrop-blur-md border-b border-indigo-500/20 sticky top-0 z-40">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex items-center justify-between h-16">
+                <div class="flex items-center space-x-3">
+                    <div class="w-10 h-10 bg-blue-700 text-white rounded-xl flex items-center justify-center font-black text-xl shadow-lg shadow-blue-600/40">
+                        N
+                    </div>
+                    <div>
+                        <span class="text-xl font-extrabold tracking-wider text-white">SISTEMA <span class="text-blue-400">NEXO</span></span>
+                        <span class="ml-2 text-xs bg-blue-900/80 text-blue-300 px-2.5 py-0.5 rounded-full border border-blue-500/30">Módulo Usuários</span>
+                    </div>
+                </div>
+
+                <div class="text-xs text-slate-400 font-mono hidden sm:block">
+                    <i class="fa-solid fa-shield-halved text-blue-400 mr-1"></i> RNFO04 & RNFO07 Ativos
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col space-y-3 pointer-events-none"></div>
+
+    <!-- Main Content Grid -->
+    <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 lg:p-8 flex flex-col justify-center">
+
+        <!-- Header Info -->
+        <div class="mb-6 text-center sm:text-left">
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-white tracking-tight">Gestão de Usuários e Permissões</h1>
+            <p class="text-slate-400 text-sm mt-1">Cadastre novos usuários ou selecione um registro da tabela para editar ou remover.</p>
+        </div>
+
+        <!-- 2 Column Layout Matching Original Wireframe -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+            
+            <!-- Left Panel: DADOS DO USUÁRIO -->
+            <div class="lg:col-span-5 retro-panel p-6 sm:p-8">
+                <h2 class="retro-title text-center text-black text-2xl sm:text-3xl mb-6 tracking-wider">
+                    DADOS DO USUÁRIO
+                </h2>
+
+                <form id="user-form" onsubmit="handleUserSubmit(event)" class="space-y-4">
+                    <input type="hidden" id="user-id">
+
+                    <!-- NOME -->
+                    <div class="grid grid-cols-12 items-center gap-2">
+                        <label for="user-name" class="col-span-5 sm:col-span-4 retro-title text-black text-base sm:text-lg">NOME –</label>
+                        <input type="text" id="user-name" required class="col-span-7 sm:col-span-8 retro-input p-2.5 text-base w-full uppercase" placeholder="JOÃO SILVA">
+                    </div>
+
+                    <!-- CPF -->
+                    <div class="grid grid-cols-12 items-center gap-2">
+                        <label for="user-cpf" class="col-span-5 sm:col-span-4 retro-title text-black text-base sm:text-lg">CPF –</label>
+                        <input type="text" id="user-cpf" required oninput="maskCPF(this)" maxlength="14" class="col-span-7 sm:col-span-8 retro-input p-2.5 text-base w-full" placeholder="000.000.000-00">
+                    </div>
+
+                    <!-- EMAIL -->
+                    <div class="grid grid-cols-12 items-center gap-2">
+                        <label for="user-email" class="col-span-5 sm:col-span-4 retro-title text-black text-base sm:text-lg">EMAIL –</label>
+                        <input type="email" id="user-email" required class="col-span-7 sm:col-span-8 retro-input p-2.5 text-base w-full lowercase" placeholder="joao@gmail.com">
+                    </div>
+
+                    <!-- SENHA -->
+                    <div class="grid grid-cols-12 items-center gap-2">
+                        <label for="user-password" class="col-span-5 sm:col-span-4 retro-title text-black text-base sm:text-lg">SENHA –</label>
+                        <input type="password" id="user-password" required minlength="8" class="col-span-7 sm:col-span-8 retro-input p-2.5 text-base w-full" placeholder="••••••••">
+                    </div>
+                    <p class="text-[11px] text-slate-800 font-bold text-right -mt-2 pr-1">Mínimo de 8 caracteres (RNFO04)</p>
+
+                    <!-- TIPO DE USUÁRIO -->
+                    <div class="grid grid-cols-12 items-center gap-2">
+                        <label for="user-type" class="col-span-5 sm:col-span-4 retro-title text-black text-xs sm:text-sm leading-tight">TIPO DE USUÁRIO –</label>
+                        <select id="user-type" class="col-span-7 sm:col-span-8 retro-input p-2.5 text-base w-full uppercase cursor-pointer">
+                            <option value="USUÁRIO" class="bg-black text-white">USUÁRIO</option>
+                            <option value="ADMIN." class="bg-black text-white">ADMIN.</option>
+                        </select>
+                    </div>
+
+                    <!-- BUTTONS -->
+                    <div class="pt-4 flex justify-center gap-3">
+                        <button type="submit" id="btn-save-user" class="retro-btn px-8 py-3 text-lg font-black tracking-wider">
+                            CADASTRAR
+                        </button>
+                        <button type="button" id="btn-cancel-user" onclick="resetUserForm()" class="hidden bg-slate-700 hover:bg-slate-800 text-white font-bold px-6 py-3 rounded-full text-sm uppercase transition shadow-md">
+                            CANCELAR
+                        </button>
+                    </div>
+                </form>
+            </div>
+
+            <!-- Right Panel: USUÁRIOS CADASTRADOS -->
+            <div class="lg:col-span-7 retro-panel p-6 sm:p-8 flex flex-col justify-between">
+                <div>
+                    <h2 class="retro-title text-center text-black text-2xl sm:text-3xl mb-6 tracking-wider">
+                        USUÁRIOS CADASTRADOS
+                    </h2>
+
+                    <!-- Table Container -->
+                    <div class="overflow-x-auto rounded-xl">
+                        <table class="w-full text-center border-separate border-spacing-y-2 border-spacing-x-2 min-w-[420px]">
+                            <thead>
+                                <tr>
+                                    <th class="retro-cell-header retro-title p-3 text-sm sm:text-base rounded-md">NOME</th>
+                                    <th class="retro-cell-header retro-title p-3 text-sm sm:text-base rounded-md">E-MAIL</th>
+                                    <th class="retro-cell-header retro-title p-3 text-sm sm:text-base rounded-md">TIPO</th>
+                                </tr>
+                            </thead>
+                            <tbody id="user-table-body">
+                                <!-- Populated dynamically by JavaScript -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Action Buttons matching original screen -->
+                <div class="mt-8 flex justify-between items-center px-2 sm:px-6">
+                    <button onclick="editSelectedUser()" class="retro-btn px-8 py-2.5 text-base sm:text-lg tracking-wider">
+                        EDITAR
+                    </button>
+                    <button onclick="deleteSelectedUser()" class="retro-btn px-8 py-2.5 text-base sm:text-lg tracking-wider bg-red-700 hover:bg-red-800">
+                        EXCLUIR
+                    </button>
+                </div>
+            </div>
+
+        </div>
+    </main>
+
+    <script>
+        // Initial sample users matching the image wireframe
+        const INITIAL_USERS = [
+            { id: 1, name: "JOÃO", email: "joao@gmail.com", cpf: "123.456.789-01", type: "USUÁRIO", pass: "12345678" },
+            { id: 2, name: "MARIA", email: "maria@gmail.com", cpf: "987.654.321-02", type: "ADMIN.", pass: "87654321" },
+            { id: 3, name: "JOSÉ", email: "jose@gmail.com", cpf: "456.789.123-03", type: "ADMIN.", pass: "11223344" }
+        ];
+
+        let users = JSON.parse(localStorage.getItem('nexo_users')) || INITIAL_USERS;
+        let selectedUserId = null;
+
+        // Initialize App
+        window.onload = function () {
+            renderUsers();
+        };
+
+        function saveData() {
+            localStorage.setItem('nexo_users', JSON.stringify(users));
+        }
+
+        // RNFO07: Display natural language status messages using Toast Notifications
+        function showToast(message, type = 'success') {
+            const container = document.getElementById('toast-container');
+            const toast = document.createElement('div');
+            
+            const bgColor = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-red-600' : 'bg-blue-600';
+            const icon = type === 'success' ? 'fa-circle-check' : type === 'error' ? 'fa-circle-exclamation' : 'fa-circle-info';
+
+            toast.className = `${bgColor} text-white px-4 py-3 rounded-xl shadow-2xl flex items-center gap-3 toast-animate text-sm font-semibold pointer-events-auto border border-white/20`;
+            toast.innerHTML = `<i class="fa-solid ${icon} text-lg"></i> <span>${message}</span>`;
+
+            container.appendChild(toast);
+
+            setTimeout(() => {
+                toast.classList.add('opacity-0', 'transition-opacity', 'duration-300');
+                setTimeout(() => toast.remove(), 300);
+            }, 3500);
+        }
+
+        // Mask for CPF Format (000.000.000-00)
+        function maskCPF(input) {
+            let v = input.value.replace(/\D/g, "");
+            v = v.replace(/(\d{3})(\d)/, "$1.$2");
+            v = v.replace(/(\d{3})(\d)/, "$1.$2");
+            v = v.replace(/(\d{3})(\d{1,2})$/, "$1-$2");
+            input.value = v;
+        }
+
+        // Render Table Rows
+        function renderUsers() {
+            const tbody = document.getElementById('user-table-body');
+            tbody.innerHTML = '';
+
+            if (users.length === 0) {
+                tbody.innerHTML = `
+                    <tr>
+                        <td colspan="3" class="p-4 text-center text-slate-700 font-bold">Nenhum usuário cadastrado.</td>
+                    </tr>
+                `;
+                return;
+            }
+
+            users.forEach(u => {
+                const tr = document.createElement('tr');
+                const isSelected = selectedUserId === u.id;
+                
+                tr.className = `cursor-pointer transition-all ${
+                    isSelected 
+                    ? 'outline outline-4 outline-yellow-400 font-black shadow-lg scale-[1.01]' 
+                    : 'hover:opacity-90'
+                }`;
+                tr.onclick = () => selectUserRow(u.id);
+
+                tr.innerHTML = `
+                    <td class="retro-cell-data retro-title p-3 text-sm sm:text-base rounded-md uppercase">${u.name}</td>
+                    <td class="retro-cell-data p-3 text-xs sm:text-sm rounded-md lowercase">${u.email}</td>
+                    <td class="retro-cell-data retro-title p-3 text-xs sm:text-sm rounded-md uppercase font-black">${u.type}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+
+            saveData();
+        }
+
+        // Select User Row
+        function selectUserRow(id) {
+            selectedUserId = selectedUserId === id ? null : id;
+            renderUsers();
+        }
+
+        // Form Submit Handler
+        function handleUserSubmit(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('user-name').value.trim().toUpperCase();
+            const cpf = document.getElementById('user-cpf').value.trim();
+            const email = document.getElementById('user-email').value.trim().toLowerCase();
+            const pass = document.getElementById('user-password').value;
+            const type = document.getElementById('user-type').value;
+            const editId = document.getElementById('user-id').value;
+
+            // CPF Digits Check (11 digits without mask)
+            const cleanCPF = cpf.replace(/\D/g, "");
+            if (cleanCPF.length !== 11) {
+                showToast("Por favor, informe um CPF válido com 11 dígitos.", "error");
+                return;
+            }
+
+            // RNFO04: Password validation rule (minimum 8 characters)
+            if (pass.length < 8) {
+                showToast("Erro de validação (RNFO04): A senha deve ter no mínimo 8 caracteres.", "error");
+                return;
+            }
+
+            if (editId) {
+                // Update Existing User
+                const idx = users.findIndex(u => u.id == editId);
+                if (idx !== -1) {
+                    users[idx] = { ...users[idx], name, cpf, email, pass, type };
+                    showToast(`Dados do usuário '${name}' atualizados com sucesso!`);
+                }
+            } else {
+                // Check unique email
+                if (users.some(u => u.email === email)) {
+                    showToast("Este endereço de e-mail já está cadastrado.", "error");
+                    return;
+                }
+
+                // Create New User
+                const newUser = {
+                    id: Date.now(),
+                    name,
+                    cpf,
+                    email,
+                    pass,
+                    type
+                };
+                users.push(newUser);
+                showToast(`Usuário '${name}' cadastrado com sucesso!`);
+            }
+
+            resetUserForm();
+            renderUsers();
+        }
+
+        // Edit Selected User
+        function editSelectedUser() {
+            if (!selectedUserId) {
+                showToast("Selecione um usuário na tabela para editar.", "info");
+                return;
+            }
+
+            const u = users.find(user => user.id === selectedUserId);
+            if (!u) return;
+
+            document.getElementById('user-id').value = u.id;
+            document.getElementById('user-name').value = u.name;
+            document.getElementById('user-cpf').value = u.cpf;
+            document.getElementById('user-email').value = u.email;
+            document.getElementById('user-password').value = u.pass;
+            document.getElementById('user-type').value = u.type;
+
+            document.getElementById('btn-save-user').innerText = 'SALVAR';
+            document.getElementById('btn-cancel-user').classList.remove('hidden');
+
+            showToast(`Preencha os campos para alterar ${u.name}.`, "info");
+        }
+
+        // Delete Selected User
+        function deleteSelectedUser() {
+            if (!selectedUserId) {
+                showToast("Selecione um usuário na tabela para excluir.", "info");
+                return;
+            }
+
+            const u = users.find(user => user.id === selectedUserId);
+            if (!u) return;
+
+            if (confirm(`Deseja realmente remover o usuário ${u.name}?`)) {
+                users = users.filter(user => user.id !== selectedUserId);
+                selectedUserId = null;
+                showToast(`Usuário '${u.name}' removido com sucesso.`);
+                resetUserForm();
+                renderUsers();
+            }
+        }
+
+        // Reset Form
+        function resetUserForm() {
+            document.getElementById('user-form').reset();
+            document.getElementById('user-id').value = '';
+            document.getElementById('btn-save-user').innerText = 'CADASTRAR';
+            document.getElementById('btn-cancel-user').classList.add('hidden');
+            selectedUserId = null;
+            renderUsers();
+        }
+    </script>
+</body>
+</html>
